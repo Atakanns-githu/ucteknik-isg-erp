@@ -64,7 +64,7 @@
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@types/smtp-mailer": "npm:@types/nodemailer@8.0.2",
-    "eslint": "^9.39.5",
+    "eslint": "^10.15.0",
     "eslint-config-next": "16.4.6",
     "postcss": "^8.5.33",
     "prisma": "^6.4.1",
