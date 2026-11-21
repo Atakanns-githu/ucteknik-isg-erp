@@ -1,0 +1,3 @@
+ALTER TYPE "MessageStatus" ADD VALUE 'DELIVERY_UNKNOWN';
+
+ALTER TABLE "OutboxMessage" ADD COLUMN "attemptId" TEXT;
