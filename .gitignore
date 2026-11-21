@@ -1,0 +1,27 @@
+node_modules
+.next
+.env
+.env.local
+.env.*.local
+*.db
+storage
+.pgpass.tmp
+.playwright-mcp
+next-env.d.ts
+*.tsbuildinfo
+certs/
+.backups/
+playwright-report/
+test-results/
+.impeccable/review/
+.gemini/
+mustafa eimza.pdf
+mustafa eimza.PNG
+imza_logo.png
+.quality/
+.impeccable/config.local.json
+.impeccable/hook.cache.json
+enlap için/
+public/branding/signatures/
+public/branding/ucteknik-seal.png
+.vercel/
