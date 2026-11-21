@@ -1,0 +1,22 @@
+node_modules
+.next
+.git
+.env
+.env.*
+!.env.example
+storage
+certs
+.pgpass.tmp
+**/*.[pP][fF][xX]
+**/*.[pP]12
+**/*.[kK][eE][yY]
+.quality
+.backups
+test-results
+playwright-report
+.impeccable
+.gemini
+enlap için
+*.pdf
+mustafa eimza.PNG
+imza_logo.png
