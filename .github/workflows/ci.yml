@@ -1,0 +1,80 @@
+name: Üçteknik İSG-ERP CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-and-tests:
+    name: Typecheck, Lint, Vitest (366 Tests) & Production Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: "postgresql://postgres:postgres@127.0.0.1:5432/ucteknik_isg"
+      AUTH_SECRET: "ci-build-only-auth-secret-32chars-minimum-0001"
+      SETTINGS_ENCRYPTION_KEY: "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
+      NEXT_PUBLIC_APP_URL: "https://ucteknik-isg-erp.vercel.app"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Unpack repository bundle if needed and commit full source tree
+        run: |
+          if [ ! -f "src/lib/db.ts" ] && [ -f "scripts/unpack-repo.mjs" ]; then
+            FORCE_UNPACK=1 node scripts/unpack-repo.mjs
+            rm -f scripts/unpack-repo.mjs
+            node -e '
+              const fs = require("fs");
+              const pkg = JSON.parse(fs.readFileSync("package.json", "utf8"));
+              pkg.scripts.postinstall = "prisma generate";
+              pkg.scripts["vercel-build"] = "prisma generate && next build";
+              fs.writeFileSync("package.json", JSON.stringify(pkg, null, 2) + "\n");
+            '
+            git config user.name "Üçteknik Engineering"
+            git config user.email "engineering@ucteknik.com"
+            git add -A
+            if ! git diff --cached --quiet; then
+              git commit -m "feat: full Üçteknik İSG-ERP production repository (144 templates, PAdES e-sign, Next-Gen Paket 1-5)"
+              git push origin HEAD:main
+            fi
+          fi
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Generate Prisma Client
+        run: pnpm prisma:generate
+
+      - name: TypeScript Typecheck
+        run: pnpm typecheck
+
+      - name: ESLint Static Analysis
+        run: pnpm lint
+
+      - name: Run Vitest Unit & Integration Suite
+        run: pnpm test
+
+      - name: Build Production Next.js Bundle & Audit Standalone Artifact
+        run: pnpm build
